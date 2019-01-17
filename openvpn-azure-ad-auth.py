@@ -76,8 +76,8 @@ def main(config_file):
 
     logger.info("request recieved to authenticate user %s", username)
 
-    token, save_cache = get_token(context, resource, username, password, client_id)
-    if token is None:
+    token, save_cache, error_code = get_token(context, resource, username, password, client_id)
+    if token is None and error_code != '50076':
         failure()
 
     if 'permitted_groups' not in config or \
@@ -184,7 +184,8 @@ def get_token(context, resource, username, password, client_id):
         )
     except adal.adal_error.AdalError as err:
         logger.info("User %s failed to authenticate: %s", username, err)
-        return None, False
+        error_code = str(err.error_response.get("error_codes")[0])   
+        return None, False, error_code
     token['passwordHash'] = hash_password(token, password)
     logger.info("authenticated user %s from AAD request", username)
     return token, True
