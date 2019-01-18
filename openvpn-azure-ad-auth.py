@@ -37,13 +37,6 @@ CONFIG_FILE = 'config.yaml'
 
 def main(config_file):
     try:
-        username = os.environ['username']
-        password = os.environ['password']
-    except KeyError:
-        logger.error("Environment variables `username` and `password` must be set")
-        failure()
-
-    try:
         with open(config_file) as cfg:
             config = yaml.load(cfg.read())
     except IOError as err:
@@ -73,6 +66,12 @@ def main(config_file):
             success()
         else:
             failure()
+    try:
+        username = os.environ['username']
+        password = os.environ['password']
+    except KeyError:
+        logger.error("Environment variables `username` and `password` must be set")
+        failure()            
 
     logger.info("request recieved to authenticate user %s", username)
 
